@@ -20,6 +20,7 @@ class Recipe extends Model
         'ingredients',
         'instructions',
         'views_count',
+        'status',
     ];
 
     protected function casts(): array

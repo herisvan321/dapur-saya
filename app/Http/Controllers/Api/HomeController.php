@@ -18,7 +18,7 @@ class HomeController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $banners = Banner::orderByDesc('created_at')->limit(10)->get()->map(function ($banner) {
+            $banners = Banner::where('status', 1)->orderByDesc('created_at')->limit(10)->get()->map(function ($banner) {
                 return [
                     'id' => $banner->id,
                     'imageUrl' => $banner->image_url ? url('storage/' . $banner->image_url) : null,
@@ -26,7 +26,7 @@ class HomeController extends Controller
                 ];
             });
 
-            $categories = Category::orderByDesc('created_at')->limit(10)->get()->map(function ($category) {
+            $categories = Category::where('status', 1)->orderByDesc('created_at')->limit(10)->get()->map(function ($category) {
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
@@ -35,7 +35,7 @@ class HomeController extends Controller
                 ];
             });
 
-            $restaurants = Recipe::with('categories')->orderByDesc('created_at')->limit(10)->get()->map(function ($recipe) {
+            $restaurants = Recipe::with('categories')->where('status', 1)->orderByDesc('created_at')->limit(10)->get()->map(function ($recipe) {
                 return $this->formatRecipe($recipe);
             });
 
@@ -80,7 +80,7 @@ class HomeController extends Controller
             ->get();
 
         return $popularLogs->map(function ($log) {
-            $recipe = Recipe::find($log->viewable_id);
+            $recipe = Recipe::where('status', 1)->find($log->viewable_id);
             if (!$recipe)
                 return null;
 
@@ -119,7 +119,7 @@ class HomeController extends Controller
     public function categories(): JsonResponse
     {
         try {
-            $categories = Category::simplePaginate(25)->through(function ($category) {
+            $categories = Category::where('status', 1)->simplePaginate(25)->through(function ($category) {
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
@@ -145,7 +145,9 @@ class HomeController extends Controller
     public function category($id): JsonResponse
     {
         try {
-            $category = Category::with('recipes.categories')->find($id);
+            $category = Category::with(['recipes' => function ($q) {
+                $q->where('status', 1);
+            }, 'recipes.categories'])->where('status', 1)->find($id);
             if (!$category) {
                 return response()->json([
                     'status' => 'error',
@@ -198,7 +200,7 @@ class HomeController extends Controller
     public function recipes(): JsonResponse
     {
         try {
-            $recipes = Recipe::with('categories')->simplePaginate(25)->through(function ($recipe) {
+            $recipes = Recipe::with('categories')->where('status', 1)->simplePaginate(25)->through(function ($recipe) {
                 return $this->formatRecipe($recipe);
             });
 
@@ -219,7 +221,7 @@ class HomeController extends Controller
     public function recipe($id): JsonResponse
     {
         try {
-            $recipe = Recipe::with('categories')->find($id);
+            $recipe = Recipe::with('categories')->where('status', 1)->find($id);
             if (!$recipe) {
                 return response()->json([
                     'status' => 'error',

@@ -15,6 +15,7 @@ class Category extends Model
         'name',
         'icon_url',
         'views_count',
+        'status',
     ];
 
     public function recipes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
