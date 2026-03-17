@@ -49,7 +49,7 @@ class HomeController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Data discovery berhasil diambil.',
+                'message' => 'Data discovery berhasil diambil. herisvan',
                 'data' => [
                     'banners' => $banners,
                     'categories' => $categories,
@@ -81,7 +81,8 @@ class HomeController extends Controller
 
         return $popularLogs->map(function ($log) {
             $recipe = Recipe::find($log->viewable_id);
-            if (!$recipe) return null;
+            if (!$recipe)
+                return null;
 
             return [
                 'name' => $recipe->name,
