@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Recipe;
 use App\Models\ViewLog;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 
 class HomeController extends Controller
 {
@@ -35,24 +36,16 @@ class HomeController extends Controller
             });
 
             $restaurants = Recipe::with('categories')->limit(10)->get()->map(function ($recipe) {
-                return [
-                    'id' => $recipe->id,
-                    'name' => $recipe->name,
-                    'categories' => $recipe->categories->map(function ($cat) {
-                        return [
-                            'id' => $cat->id,
-                            'name' => $cat->name,
-                        ];
-                    }),
-                    'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
-                    'isExclusive' => (bool) $recipe->is_exclusive,
-                    'isTrending' => (bool) $recipe->is_trending,
-                    'description' => $recipe->description,
-                    'ingredients' => $recipe->ingredients,
-                    'instructions' => $recipe->instructions,
-                    'viewsCount' => $recipe->views_count,
-                ];
+                return $this->formatRecipe($recipe);
             });
+
+            // Popular section
+            $popular = [
+                'today' => $this->getPopularRecipes(Carbon::now()->startOfDay()),
+                'thisWeek' => $this->getPopularRecipes(Carbon::now()->startOfWeek()),
+                'thisMonth' => $this->getPopularRecipes(Carbon::now()->startOfMonth()),
+                'thisYear' => $this->getPopularRecipes(Carbon::now()->startOfYear()),
+            ];
 
             return response()->json([
                 'status' => 'success',
@@ -61,6 +54,7 @@ class HomeController extends Controller
                     'banners' => $banners,
                     'categories' => $categories,
                     'restaurants' => $restaurants,
+                    'popular' => $popular,
                 ]
             ]);
         } catch (\Exception $e) {
@@ -70,6 +64,47 @@ class HomeController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Helper to fetch popular recipes based on view_logs in a period.
+     */
+    private function getPopularRecipes(Carbon $startDate)
+    {
+        return Recipe::with('categories')
+            ->withCount(['views as period_views' => function ($query) use ($startDate) {
+                $query->where('created_at', '>=', $startDate);
+            }])
+            ->orderByDesc('period_views')
+            ->limit(7)
+            ->get()
+            ->map(function ($recipe) {
+                return $this->formatRecipe($recipe);
+            });
+    }
+
+    /**
+     * Helper to format recipe for response.
+     */
+    private function formatRecipe($recipe)
+    {
+        return [
+            'id' => $recipe->id,
+            'name' => $recipe->name,
+            'categories' => $recipe->categories->map(function ($cat) {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                ];
+            }),
+            'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
+            'isExclusive' => (bool) $recipe->is_exclusive,
+            'isTrending' => (bool) $recipe->is_trending,
+            'description' => $recipe->description,
+            'ingredients' => $recipe->ingredients,
+            'instructions' => $recipe->instructions,
+            'viewsCount' => $recipe->views_count,
+        ];
     }
 
     public function categories(): JsonResponse
@@ -155,23 +190,7 @@ class HomeController extends Controller
     {
         try {
             $recipes = Recipe::with('categories')->simplePaginate(25)->through(function ($recipe) {
-                return [
-                    'id' => $recipe->id,
-                    'name' => $recipe->name,
-                    'categories' => $recipe->categories->map(function ($cat) {
-                        return [
-                            'id' => $cat->id,
-                            'name' => $cat->name,
-                        ];
-                    }),
-                    'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
-                    'isExclusive' => (bool) $recipe->is_exclusive,
-                    'isTrending' => (bool) $recipe->is_trending,
-                    'description' => $recipe->description,
-                    'ingredients' => $recipe->ingredients,
-                    'instructions' => $recipe->instructions,
-                    'viewsCount' => $recipe->views_count,
-                ];
+                return $this->formatRecipe($recipe);
             });
 
             return response()->json([
@@ -206,28 +225,14 @@ class HomeController extends Controller
                 'viewable_id' => $recipe->id,
             ]);
 
+            $data = $this->formatRecipe($recipe);
+            $data['createdAt'] = $recipe->created_at;
+            $data['updatedAt'] = $recipe->updated_at;
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Data resep berhasil diambil.',
-                'data' => [
-                    'id' => $recipe->id,
-                    'name' => $recipe->name,
-                    'categories' => $recipe->categories->map(function ($cat) {
-                        return [
-                            'id' => $cat->id,
-                            'name' => $cat->name,
-                        ];
-                    }),
-                    'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
-                    'isExclusive' => (bool) $recipe->is_exclusive,
-                    'isTrending' => (bool) $recipe->is_trending,
-                    'description' => $recipe->description,
-                    'ingredients' => $recipe->ingredients,
-                    'instructions' => $recipe->instructions,
-                    'viewsCount' => $recipe->views_count,
-                    'createdAt' => $recipe->created_at,
-                    'updatedAt' => $recipe->updated_at,
-                ],
+                'data' => $data,
             ]);
         } catch (\Exception $e) {
             return response()->json([

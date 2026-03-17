@@ -111,7 +111,6 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category): JsonResponse
     {
-        $this->deleteImage($category->icon_url);
         $category->delete();
 
         return response()->json([

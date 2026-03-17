@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Recipe extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -34,5 +35,10 @@ class Recipe extends Model
     public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Category::class);
+    }
+
+    public function views(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ViewLog::class, 'viewable');
     }
 }

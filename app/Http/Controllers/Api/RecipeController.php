@@ -180,7 +180,6 @@ class RecipeController extends Controller
      */
     public function destroy(Recipe $recipe): JsonResponse
     {
-        $this->deleteImage($recipe->image_url);
         $recipe->delete();
 
         return response()->json([
