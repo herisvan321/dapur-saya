@@ -17,7 +17,7 @@ class CategoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categories = Category::withCount('recipes')->simplePaginate(10)->through(function ($category) {
+        $categories = Category::withCount('recipes')->orderByDesc('created_at')->get()->map(function ($category) {
             $category->icon_url = $category->icon_url ? url('storage/' . $category->icon_url) : null;
             return $category;
         });

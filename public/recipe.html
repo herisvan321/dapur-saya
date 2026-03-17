@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Recipe Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Recipe Admin <span class="text-blue-600">Console</span></h1>
+            <input type="text" id="searchInput" placeholder="Cari resep..." class="w-full md:w-64 px-4 py-2 border rounded-full text-sm focus:ring-2 focus:ring-blue-400 outline-none shadow-sm">
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-5">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 sticky top-8">
+                    <h2 id="formTitle" class="text-xl font-bold mb-4 text-slate-700">Tambah Resep Baru</h2>
+                    <form id="recipeForm" class="space-y-4">
+                        <input type="hidden" id="recipeId">
+                        
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-600 mb-1">Nama Resep</label>
+                                <input type="text" id="name" class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Nasi Goreng" required>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-600 mb-2">Pilih Kategori</label>
+                                <div id="categoryContainer" class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-3 border border-slate-200 rounded-lg bg-slate-50 custom-scrollbar">
+                                    <span class="text-xs text-slate-400 italic">Memuat kategori...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-600 mb-1">Bahan-bahan</label>
+                                <div id="ingredientsList" class="space-y-2 mb-2"></div>
+                                <button type="button" onclick="addRow('ingredientsList')" class="text-xs font-bold text-blue-600 hover:text-blue-800">+ Tambah Bahan</button>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-600 mb-1">Instruksi</label>
+                                <div id="instructionsList" class="space-y-2 mb-2"></div>
+                                <button type="button" onclick="addRow('instructionsList')" class="text-xs font-bold text-blue-600 hover:text-blue-800">+ Tambah Langkah</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-600 mb-1">Deskripsi</label>
+                            <textarea id="description" class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows="2" required></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center space-x-2 cursor-pointer bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                <input type="checkbox" id="is_exclusive" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-xs font-bold text-slate-700">EXCLUSIVE</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                <input type="checkbox" id="is_trending" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-xs font-bold text-slate-700">TRENDING</span>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-600 mb-1">Gambar</label>
+                            <input type="file" id="image" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 shadow-lg transition active:scale-95">Simpan</button>
+                            <button type="button" id="btnCancel" class="hidden w-full mt-2 bg-slate-200 text-slate-600 font-bold py-3 rounded-lg hover:bg-slate-300 transition">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold tracking-wider">
+                                <tr>
+                                    <th class="p-4">Resep</th>
+                                    <th class="p-4">Kategori</th>
+                                    <th class="p-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recipeTableBody" class="divide-y divide-slate-100">
+                                <tr><td colspan="3" class="p-10 text-center text-slate-400">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/admin';
+        const TOKEN = '4|OeHck1LRHgvRwLMj2WSu3fncgwgs7uZGk5fY1FCF5ad734c7';
+        const headers = { 'Authorization': `Bearer ${TOKEN}`, 'Accept': 'application/json' };
+
+        // --- DYNAMIC ROWS HANDLER ---
+        function addRow(containerId, value = '') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'flex items-center space-x-2';
+            div.innerHTML = `
+                <input type="text" value="${value}" class="flex-1 border border-slate-200 p-1.5 rounded text-sm focus:border-blue-400 outline-none" placeholder="Isi di sini..." required>
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600">✕</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function getListValues(containerId) {
+            return Array.from(document.querySelectorAll(`#${containerId} input`)).map(input => input.value);
+        }
+
+        function setListValues(containerId, items) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            if (Array.isArray(items)) items.forEach(item => addRow(containerId, item));
+        }
+
+        // --- API CALLS ---
+        async function fetchCategories() {
+            try {
+                const res = await fetch(`${API_BASE}/categories`, { headers });
+                const result = await res.json();
+                const categories = result.data.data || result.data || [];
+                document.getElementById('categoryContainer').innerHTML = categories.map(cat => `
+                    <label class="flex items-center space-x-2 text-xs text-slate-600 cursor-pointer">
+                        <input type="checkbox" name="category_ids" value="${cat.id}" class="rounded text-blue-600">
+                        <span class="truncate">${cat.name}</span>
+                    </label>
+                `).join('');
+            } catch (err) { console.error('Gagal kategori'); }
+        }
+
+        async function fetchRecipes(search = '') {
+            try {
+                const url = new URL(`${API_BASE}/recipes`);
+                if (search) url.searchParams.append('search', search);
+                const res = await fetch(url, { headers });
+                const result = await res.json();
+                renderTable(result.data.data);
+            } catch (err) { console.error('Gagal resep'); }
+        }
+
+        function renderTable(recipes) {
+            document.getElementById('recipeTableBody').innerHTML = recipes.map(recipe => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4">
+                        <div class="flex items-center space-x-3">
+                            <img src="${recipe.image_url || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded shadow-sm object-cover bg-slate-100">
+                            <div>
+                                <div class="font-bold text-slate-800 text-sm">${recipe.name}</div>
+                                <div class="text-[10px] text-slate-400">Exclusive: ${recipe.is_exclusive ? 'Ya' : 'Tidak'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex flex-wrap gap-1">
+                            ${recipe.categories.map(c => `<span class="bg-blue-50 text-blue-600 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase">${c.name}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex justify-center space-x-2">
+                            <button onclick="editRecipe('${recipe.id}')" class="text-blue-500 hover:scale-110 transition">✏️</button>
+                            <button onclick="deleteRecipe('${recipe.id}')" class="text-red-400 hover:scale-110 transition">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- FORM SUBMIT ---
+        document.getElementById('recipeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('recipeId').value;
+            const formData = new FormData();
+            
+            formData.append('name', document.getElementById('name').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('is_exclusive', document.getElementById('is_exclusive').checked ? 1 : 0);
+            formData.append('is_trending', document.getElementById('is_trending').checked ? 1 : 0);
+
+            // Categories
+            Array.from(document.querySelectorAll('input[name="category_ids"]:checked'))
+                 .forEach(cb => formData.append('category_ids[]', cb.value));
+
+            // Ingredients & Instructions (dikirim sebagai array)
+            getListValues('ingredientsList').forEach(val => formData.append('ingredients[]', val));
+            getListValues('instructionsList').forEach(val => formData.append('instructions[]', val));
+
+            const imgFile = document.getElementById('image').files[0];
+            if (imgFile) formData.append('image', imgFile);
+
+            if (id) formData.append('_method', 'PUT');
+
+            try {
+                const res = await fetch(id ? `${API_BASE}/recipes/${id}` : `${API_BASE}/recipes`, {
+                    method: 'POST', headers, body: formData
+                });
+                if (res.ok) { resetForm(); fetchRecipes(); alert('Berhasil!'); }
+            } catch (err) { alert('Gagal simpan'); }
+        });
+
+        // --- EDIT & DELETE ---
+        async function editRecipe(id) {
+            const res = await fetch(`${API_BASE}/recipes/${id}`, { headers });
+            const { data } = await res.json();
+
+            document.getElementById('recipeId').value = data.id;
+            document.getElementById('name').value = data.name;
+            document.getElementById('description').value = data.description;
+            document.getElementById('is_exclusive').checked = data.isExclusive;
+            document.getElementById('is_trending').checked = data.isTrending;
+
+            // List Values
+            setListValues('ingredientsList', data.ingredients);
+            setListValues('instructionsList', data.instructions);
+
+            // Categories
+            const catIds = data.categories.map(c => String(c.id));
+            document.querySelectorAll('input[name="category_ids"]').forEach(cb => {
+                cb.checked = catIds.includes(String(cb.value));
+            });
+
+            document.getElementById('formTitle').innerText = 'Edit Resep 📝';
+            document.getElementById('btnCancel').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function deleteRecipe(id) {
+            if (confirm('Hapus?')) {
+                await fetch(`${API_BASE}/recipes/${id}`, { method: 'DELETE', headers });
+                fetchRecipes();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('recipeForm').reset();
+            document.getElementById('recipeId').value = '';
+            document.getElementById('ingredientsList').innerHTML = '';
+            document.getElementById('instructionsList').innerHTML = '';
+            document.getElementById('formTitle').innerText = 'Tambah Resep Baru';
+            document.getElementById('btnCancel').classList.add('hidden');
+            // Init minimal satu baris kosong
+            addRow('ingredientsList');
+            addRow('instructionsList');
+        }
+
+        // --- SEARCH ---
+        document.getElementById('searchInput').oninput = (e) => {
+            clearTimeout(window.t);
+            window.t = setTimeout(() => fetchRecipes(e.target.value), 500);
+        };
+
+        // --- INIT ---
+        fetchCategories();
+        fetchRecipes();
+        addRow('ingredientsList');
+        addRow('instructionsList');
+    </script>
+</body>
+</html>

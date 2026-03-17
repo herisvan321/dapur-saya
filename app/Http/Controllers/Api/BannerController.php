@@ -17,7 +17,7 @@ class BannerController extends Controller
      */
     public function index(): JsonResponse
     {
-        $banners = Banner::orderByDesc('created_at')->simplePaginate(10)->through(function ($banner) {
+        $banners = Banner::orderByDesc('created_at')->simplePaginate(25)->through(function ($banner) {
             $banner->image_url = $banner->image_url ? url('storage/' . $banner->image_url) : null;
             return $banner;
         });

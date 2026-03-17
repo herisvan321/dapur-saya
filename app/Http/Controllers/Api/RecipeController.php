@@ -48,7 +48,7 @@ class RecipeController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $recipes = $query->simplePaginate(10)->through(function ($recipe) {
+        $recipes = $query->orderByDesc('created_at')->simplePaginate(25)->through(function ($recipe) {
             $recipe->image_url = $recipe->image_url ? url('storage/' . $recipe->image_url) : null;
             return $recipe;
         });
@@ -181,7 +181,6 @@ class RecipeController extends Controller
     public function destroy(Recipe $recipe): JsonResponse
     {
         $recipe->delete();
-
         return response()->json([
             'status' => 'success',
             'message' => 'Resep berhasil dihapus.',

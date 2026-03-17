@@ -18,7 +18,7 @@ class HomeController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $banners = Banner::limit(10)->get()->map(function ($banner) {
+            $banners = Banner::orderByDesc('created_at')->limit(10)->get()->map(function ($banner) {
                 return [
                     'id' => $banner->id,
                     'imageUrl' => $banner->image_url ? url('storage/' . $banner->image_url) : null,
@@ -26,7 +26,7 @@ class HomeController extends Controller
                 ];
             });
 
-            $categories = Category::limit(10)->get()->map(function ($category) {
+            $categories = Category::orderByDesc('created_at')->limit(10)->get()->map(function ($category) {
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
@@ -35,7 +35,7 @@ class HomeController extends Controller
                 ];
             });
 
-            $restaurants = Recipe::with('categories')->limit(10)->get()->map(function ($recipe) {
+            $restaurants = Recipe::with('categories')->orderByDesc('created_at')->limit(10)->get()->map(function ($recipe) {
                 return $this->formatRecipe($recipe);
             });
 
@@ -71,16 +71,24 @@ class HomeController extends Controller
      */
     private function getPopularRecipes(Carbon $startDate)
     {
-        return Recipe::with('categories')
-            ->withCount(['views as period_views' => function ($query) use ($startDate) {
-                $query->where('created_at', '>=', $startDate);
-            }])
+        $popularLogs = ViewLog::where('viewable_type', 'recipe')
+            ->where('created_at', '>=', $startDate)
+            ->select('viewable_id', \Illuminate\Support\Facades\DB::raw('count(*) as period_views'))
+            ->groupBy('viewable_id')
             ->orderByDesc('period_views')
             ->limit(7)
-            ->get()
-            ->map(function ($recipe) {
-                return $this->formatRecipe($recipe);
-            });
+            ->get();
+
+        return $popularLogs->map(function ($log) {
+            $recipe = Recipe::find($log->viewable_id);
+            if (!$recipe) return null;
+
+            return [
+                'name' => $recipe->name,
+                'period_views' => $log->period_views,
+                'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
+            ];
+        })->filter()->values();
     }
 
     /**
