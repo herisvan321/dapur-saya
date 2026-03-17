@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/nusanwo1/dapur-saya.nusanwordtekno.com
+    - /bin/cp -R * $DEPLOYPATH
