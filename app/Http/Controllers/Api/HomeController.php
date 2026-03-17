@@ -49,7 +49,7 @@ class HomeController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Data discovery berhasil diambil.',
+                'message' => 'Data discovery berhasil diambil. ',
                 'data' => [
                     'banners' => $banners,
                     'categories' => $categories,
