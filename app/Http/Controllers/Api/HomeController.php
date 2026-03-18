@@ -253,4 +253,37 @@ class HomeController extends Controller
             ], 500);
         }
     }
+    public function search(\Illuminate\Http\Request $request): JsonResponse
+    {
+        try {
+            $query = $request->input('query');
+
+            $recipes = Recipe::with('categories')
+                ->where('status', 1)
+                ->where(function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%")
+                        ->orWhereHas('categories', function ($q) use ($query) {
+                            $q->where('name', 'like', "%{$query}%");
+                        });
+                })
+                ->orderByDesc('created_at')
+                ->simplePaginate(10);
+
+            $recipes->through(function ($recipe) {
+                return $this->formatRecipe($recipe);
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Hasil pencarian resep.',
+                'data' => $recipes,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal melakukan pencarian resep.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

@@ -17,6 +17,7 @@ Route::get('/categories', [HomeController::class, 'categories']);
 Route::get('/categories/{category}', [HomeController::class, 'category']);
 Route::get('/recipes', [HomeController::class, 'recipes']);
 Route::get('/recipes/{recipe}', [HomeController::class, 'recipe']);
+Route::get('/search', [HomeController::class, 'search']);
 
 // ─── Auth ───
 Route::post('/login', [AuthController::class, 'login']);
