@@ -18,7 +18,7 @@ class BannerController extends Controller
     public function index(): JsonResponse
     {
         $banners = Banner::orderByDesc('created_at')->simplePaginate(25)->through(function ($banner) {
-            $banner->image_url = $banner->image_url ? url('storage/' . $banner->image_url) : null;
+            $banner->image_url = $banner->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $banner->image_url : null;
             return $banner;
         });
 
@@ -45,7 +45,7 @@ class BannerController extends Controller
             'offer_text' => $request->offer_text,
         ]);
 
-        $banner->image_url = url('storage/' . $banner->image_url);
+        $banner->image_url = rtrim(config('app.url'), '/') . '/storage/' . $banner->image_url;
 
         return response()->json([
             'status' => 'success',
@@ -59,7 +59,7 @@ class BannerController extends Controller
      */
     public function show(Banner $banner): JsonResponse
     {
-        $banner->image_url = $banner->image_url ? url('storage/' . $banner->image_url) : null;
+        $banner->image_url = $banner->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $banner->image_url : null;
 
         return response()->json([
             'status' => 'success',
@@ -87,7 +87,7 @@ class BannerController extends Controller
         }
 
         $banner->save();
-        $banner->image_url = $banner->image_url ? url('storage/' . $banner->image_url) : null;
+        $banner->image_url = $banner->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $banner->image_url : null;
 
         return response()->json([
             'status' => 'success',

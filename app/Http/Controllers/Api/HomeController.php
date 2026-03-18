@@ -21,7 +21,7 @@ class HomeController extends Controller
             $banners = Banner::where('status', 1)->orderByDesc('created_at')->limit(10)->get()->map(function ($banner) {
                 return [
                     'id' => $banner->id,
-                    'imageUrl' => $banner->image_url ? url('storage/' . $banner->image_url) : null,
+                    'imageUrl' => $banner->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $banner->image_url : null,
                     'offerText' => $banner->offer_text,
                 ];
             });
@@ -30,7 +30,7 @@ class HomeController extends Controller
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
-                    'iconUrl' => $category->icon_url ? url('storage/' . $category->icon_url) : null,
+                    'iconUrl' => $category->icon_url ? rtrim(config('app.url'), '/') . '/storage/' . $category->icon_url : null,
                     'viewsCount' => $category->views_count,
                 ];
             });
@@ -87,7 +87,7 @@ class HomeController extends Controller
             return [
                 'name' => $recipe->name,
                 'period_views' => $log->period_views,
-                'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
+                'imageUrl' => $recipe->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $recipe->image_url : null,
             ];
         })->filter()->values();
     }
@@ -106,7 +106,7 @@ class HomeController extends Controller
                     'name' => $cat->name,
                 ];
             }),
-            'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
+            'imageUrl' => $recipe->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $recipe->image_url : null,
             'isExclusive' => (bool) $recipe->is_exclusive,
             'isTrending' => (bool) $recipe->is_trending,
             'description' => $recipe->description,
@@ -123,7 +123,7 @@ class HomeController extends Controller
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
-                    'iconUrl' => $category->icon_url ? url('storage/' . $category->icon_url) : null,
+                    'iconUrl' => $category->icon_url ? rtrim(config('app.url'), '/') . '/storage/' . $category->icon_url : null,
                     'viewsCount' => $category->views_count,
                 ];
             });
@@ -168,7 +168,7 @@ class HomeController extends Controller
                 'data' => [
                     'id' => $category->id,
                     'name' => $category->name,
-                    'iconUrl' => $category->icon_url ? url('storage/' . $category->icon_url) : null,
+                    'iconUrl' => $category->icon_url ? rtrim(config('app.url'), '/') . '/storage/' . $category->icon_url : null,
                     'viewsCount' => $category->views_count,
                     'restaurants' => $category->recipes->map(function ($recipe) {
                         return [
@@ -180,7 +180,7 @@ class HomeController extends Controller
                                     'name' => $cat->name,
                                 ];
                             }),
-                            'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
+                            'imageUrl' => $recipe->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $recipe->image_url : null,
                             'isExclusive' => (bool) $recipe->is_exclusive,
                             'isTrending' => (bool) $recipe->is_trending,
                             'viewsCount' => $recipe->views_count,

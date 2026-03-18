@@ -49,7 +49,7 @@ class RecipeController extends Controller
         }
 
         $recipes = $query->orderByDesc('created_at')->simplePaginate(25)->through(function ($recipe) {
-            $recipe->image_url = $recipe->image_url ? url('storage/' . $recipe->image_url) : null;
+            $recipe->image_url = $recipe->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $recipe->image_url : null;
             return $recipe;
         });
 
@@ -94,7 +94,7 @@ class RecipeController extends Controller
         $recipe->categories()->attach($request->category_ids);
 
         $recipe->load('categories');
-        $recipe->image_url = $recipe->image_url ? url('storage/' . $recipe->image_url) : null;
+        $recipe->image_url = $recipe->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $recipe->image_url : null;
 
         return response()->json([
             'status' => 'success',
@@ -116,7 +116,7 @@ class RecipeController extends Controller
                 'id' => $recipe->id,
                 'name' => $recipe->name,
                 'categories' => $recipe->categories,
-                'imageUrl' => $recipe->image_url ? url('storage/' . $recipe->image_url) : null,
+                'imageUrl' => $recipe->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $recipe->image_url : null,
                 'isExclusive' => (bool) $recipe->is_exclusive,
                 'isTrending' => (bool) $recipe->is_trending,
                 'description' => $recipe->description,
@@ -166,7 +166,7 @@ class RecipeController extends Controller
         }
 
         $recipe->load('categories');
-        $recipe->image_url = $recipe->image_url ? url('storage/' . $recipe->image_url) : null;
+        $recipe->image_url = $recipe->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $recipe->image_url : null;
 
         return response()->json([
             'status' => 'success',

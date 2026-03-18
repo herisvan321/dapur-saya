@@ -18,7 +18,7 @@ class CategoryController extends Controller
     public function index(): JsonResponse
     {
         $categories = Category::withCount('recipes')->orderByDesc('created_at')->get()->map(function ($category) {
-            $category->icon_url = $category->icon_url ? url('storage/' . $category->icon_url) : null;
+            $category->icon_url = $category->icon_url ? rtrim(config('app.url'), '/') . '/storage/' . $category->icon_url : null;
             return $category;
         });
 
@@ -48,7 +48,7 @@ class CategoryController extends Controller
             'icon_url' => $iconUrl,
         ]);
 
-        $category->icon_url = $category->icon_url ? url('storage/' . $category->icon_url) : null;
+        $category->icon_url = $category->icon_url ? rtrim(config('app.url'), '/') . '/storage/' . $category->icon_url : null;
 
         return response()->json([
             'status' => 'success',
@@ -63,11 +63,11 @@ class CategoryController extends Controller
     public function show(Category $category): JsonResponse
     {
         $category->load('recipes');
-        $category->icon_url = $category->icon_url ? url('storage/' . $category->icon_url) : null;
+        $category->icon_url = $category->icon_url ? rtrim(config('app.url'), '/') . '/storage/' . $category->icon_url : null;
 
         // Map image URLs pada recipes
         $category->recipes->transform(function ($recipe) {
-            $recipe->image_url = $recipe->image_url ? url('storage/' . $recipe->image_url) : null;
+            $recipe->image_url = $recipe->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $recipe->image_url : null;
             return $recipe;
         });
 
@@ -97,7 +97,7 @@ class CategoryController extends Controller
         }
 
         $category->save();
-        $category->icon_url = $category->icon_url ? url('storage/' . $category->icon_url) : null;
+        $category->icon_url = $category->icon_url ? rtrim(config('app.url'), '/') . '/storage/' . $category->icon_url : null;
 
         return response()->json([
             'status' => 'success',
