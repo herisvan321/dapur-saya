@@ -14,5 +14,6 @@ class Banner extends Model
         'image_url',
         'offer_text',
         'status',
+        'order',
     ];
 }
