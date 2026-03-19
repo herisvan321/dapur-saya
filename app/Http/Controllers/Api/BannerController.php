@@ -86,6 +86,10 @@ class BannerController extends Controller
             $banner->offer_text = $request->offer_text;
         }
 
+        if ($request->has('status')) {
+            $banner->status = $request->status;
+        }
+
         $banner->save();
         $banner->image_url = $banner->image_url ? rtrim(config('app.url'), '/') . '/storage/' . $banner->image_url : null;
 
