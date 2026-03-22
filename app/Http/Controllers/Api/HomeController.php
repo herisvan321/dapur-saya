@@ -119,7 +119,7 @@ class HomeController extends Controller
     public function categories(): JsonResponse
     {
         try {
-            $categories = Category::where('status', 1)->simplePaginate(25)->through(function ($category) {
+            $categories = Category::where('status', 1)->orderBy('created_at', 'desc')->simplePaginate(25)->through(function ($category) {
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
@@ -200,7 +200,7 @@ class HomeController extends Controller
     public function recipes(): JsonResponse
     {
         try {
-            $recipes = Recipe::with('categories')->where('status', 1)->simplePaginate(25)->through(function ($recipe) {
+            $recipes = Recipe::with('categories')->where('status', 1)->orderBy('created_at', 'desc')->simplePaginate(25)->through(function ($recipe) {
                 return $this->formatRecipe($recipe);
             });
 
