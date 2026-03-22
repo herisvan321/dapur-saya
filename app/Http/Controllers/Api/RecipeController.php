@@ -143,6 +143,7 @@ class RecipeController extends Controller
             'description' => 'sometimes|required|string',
             'ingredients' => 'sometimes|required|array',
             'instructions' => 'sometimes|required|array',
+            'status' => 'nullable|boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -157,6 +158,7 @@ class RecipeController extends Controller
             'description',
             'ingredients',
             'instructions',
+            'status',
         ]));
 
         $recipe->save();
