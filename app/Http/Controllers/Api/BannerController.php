@@ -34,7 +34,7 @@ class BannerController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'offer_text' => 'required|string|max:255',
         ]);
 
@@ -73,7 +73,7 @@ class BannerController extends Controller
     public function update(Request $request, Banner $banner): JsonResponse
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
             'offer_text' => 'sometimes|required|string|max:255',
         ]);
 
