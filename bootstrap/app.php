@@ -34,21 +34,33 @@ return Application::configure(basePath: dirname(__DIR__))
             return $request->expectsJson();
         });
 
-        $exceptions->render(function (Throwable $e, Request $request) {
+       $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*')) {
-                // Handle AuthenticationException specifically
+                
+                // 1. Jika Gagal Validasi (422)
+                if ($e instanceof ValidationException) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => $e->validator->errors()->first(), // Ambil pesan error pertama
+                        'errors' => $e->validator->errors()
+                    ], 422);
+                }
+
+                // 2. Jika Token Expired/Salah (401)
                 if ($e instanceof AuthenticationException) {
                     return response()->json([
-                        'status'  => 'error',
-                        'message' => 'Token tidak valid atau sudah kedaluwarsa. Silakan login kembali.',
+                        'status' => 'error',
+                        'message' => 'Sesi berakhir. Silakan login kembali.',
                     ], 401);
                 }
 
-                // Standardized format for all other errors
+                // 3. Error Lainnya (500, 404, dll)
+                $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                
                 return response()->json([
-                    'status'  => 'error',
-                    'message' => $e->getMessage() ?: 'Terjadi kesalahan sistem.',
-                ], method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500);
+                    'status' => 'error',
+                    'message' => $e->getMessage() ?: 'Terjadi kesalahan sistem di server.',
+                ], $statusCode);
             }
         });
     })->create();
