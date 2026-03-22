@@ -96,6 +96,10 @@ class CategoryController extends Controller
             $category->name = $request->name;
         }
 
+        if ($request->has('status')) {
+            $category->status = $request->status;
+        }
+
         $category->save();
         $category->icon_url = $category->icon_url ? rtrim(config('app.url'), '/') . '/storage/' . $category->icon_url : null;
 
