@@ -7,6 +7,7 @@ use App\Models\Recipe;
 use App\Traits\UploadsWebpImage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Category;
 
 class RecipeController extends Controller
 {
@@ -101,6 +102,16 @@ class RecipeController extends Controller
             'message' => 'Resep berhasil ditambahkan.',
             'data' => $recipe,
         ], 201);
+    }
+
+    public function getCategories(Request $request): JsonResponse
+    {
+        $categories = Category::where('status', 1)->where('name', 'like', '%' . $request->search . '%')->get();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data kategori berhasil diambil.',
+            'data' => $categories,
+        ]);
     }
 
     /**

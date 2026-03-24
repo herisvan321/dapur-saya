@@ -38,5 +38,6 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::resource('banners', BannerController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('recipes', RecipeController::class);
+    Route::get('get-categories', [RecipeController::class, 'getCategories']);
 
 });
