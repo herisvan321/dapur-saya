@@ -28,8 +28,8 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     // Auth
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/profile', [ProfileController::class, 'show']);
-    Route::post('/profile', [ProfileController::class, 'update']);
-    Route::post('/profile/change-password', [ProfileController::class, 'changePassword']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::put('/profile/change-password', [ProfileController::class, 'changePassword']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
