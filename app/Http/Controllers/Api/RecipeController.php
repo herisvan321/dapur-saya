@@ -106,7 +106,7 @@ class RecipeController extends Controller
 
     public function getCategories(Request $request): JsonResponse
     {
-        $query = $request->input('query');
+        $query = $request->input('search');
         $categories = Category::where('status', 1)->where('name', 'like', '%' . $query . '%')->simplePaginate(50);
         return response()->json([
             'status' => 'success',
